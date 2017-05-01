@@ -1,15 +1,12 @@
 package cucumberID.DataTableCucumber;
 
-
-
-
+import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.Select;
 
+import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -17,50 +14,47 @@ import cucumber.api.java.en.When;
 public class Login {
 	WebDriver driver;
 
-	@Given("^User navigates to Facebook$")
-	public void user_navigates_to_Facebook() throws Throwable {
+	@Given("^I am on the new user registration page$")
+	public void i_am_on_the_new_user_registration_page() throws Throwable {
 		System.setProperty("webdriver.gecko.driver", "E:/Geckodriver/geckodriver.exe");
 		driver = new FirefoxDriver();
 		driver.get("https://www.facebook.com/");
 		// driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	}
 
-	@When("^I enter username as firstUser$")
-	public void i_enter_username_as_firstUser() throws Throwable {
-		driver.findElement(By.id("email")).sendKeys("firstUser");
+	@When("^I enter invalid data on the page$")
+	public void i_enter_invalid_data_on_the_page(DataTable table) throws Throwable {
+		// Initialize data table
+		List<List<String>> data = table.raw();
+		System.out.println(data.get(1).get(1));
+
+		// Enter data
+		driver.findElement(By.name("firstname")).sendKeys(data.get(1).get(1));
+		driver.findElement(By.name("lastname")).sendKeys(data.get(2).get(1));
+		driver.findElement(By.name("reg_email__")).sendKeys(data.get(3).get(1));
+		driver.findElement(By.name("reg_email_confirmation__")).sendKeys(data.get(4).get(1));
+		driver.findElement(By.name("reg_passwd__")).sendKeys(data.get(5).get(1));
+
+		Select dropdownB = new Select(driver.findElement(By.name("birthday_day")));
+		dropdownB.selectByValue("15");
+
+		Select dropdownM = new Select(driver.findElement(By.name("birthday_month")));
+		dropdownM.selectByValue("6");
+
+		Select dropdownY = new Select(driver.findElement(By.name("birthday_year")));
+		dropdownY.selectByValue("1990");
+
+		driver.findElement(By.className("_58mt")).click();
+		// Click submit button driver.findElement(By.name("websubmit")).click();
 	}
 
-	@When("^I enter username as secondUser$")
-	public void i_enter_username_as_secondUser() throws Throwable {
-		// Write code here that turns the phrase above into concrete actions
-		driver.findElement(By.id("email")).sendKeys("secondUser");
-	}
-
-	@When("^I enter password as password$")
-	public void i_enter_password_as_password() throws Throwable {
-		driver.findElement(By.id("pass")).sendKeys("password");
-	}
-
-	@When("^I click Login button$")
-	public void i_click_Login_button() throws Throwable {
-		// Write code here that turns the phrase above into concrete actions
-		driver.findElement(By.xpath(".//input[@type='submit']")).click();
-	}
-
-	@Then("^Login should fail$")
-	public void login_should_fail() throws Throwable {
-		System.out.println("Login failed");
-		//driver.quit();
-	}
-
-	@Then("^Relogin option should be available$")
-	public void relogin_option_should_be_available() throws Throwable {
-		if (driver.getCurrentUrl().equalsIgnoreCase("https://www.facebook.com/login.php?login_attempt=1&lwv=110")) {
+	@Then("^the user registration should be unsuccessful$")
+	public void the_user_registration_should_be_unsuccessful() throws Throwable {
+		if (driver.getCurrentUrl().equalsIgnoreCase("https://www.facebook.com/")) {
 			System.out.println("Test Pass");
 		} else {
 			System.out.println("Test Failed");
 		}
-		// driver.quit();
+		driver.close();
 	}
-
 }
